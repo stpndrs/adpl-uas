@@ -1,0 +1,23 @@
+body {
+    background-color: $bg-light;
+    font-family: 'Inter', sans-serif; // Atau font serupa
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    margin-left: $sidebar-width;
+    padding: 20px 40px;
+    
+    .header-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 30px;
+    }
+}

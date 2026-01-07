@@ -1,0 +1,48 @@
+// Variabel (sesuai file sebelumnya)
+$primary: #2563eb;
+$danger: #ef4444;
+$border-color: #e5e7eb;
+$text-dark: #1f2937;
+
+.form-group {
+    margin-bottom: 1.25rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: $text-dark;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+
+        &:focus {
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+
+        // Style saat ada error
+        &.is-invalid {
+            border-color: $danger;
+
+            &:focus {
+                box-shadow: 0 0 0 3px rgba($danger, 0.1);
+            }
+        }
+    }
+
+    .invalid-feedback {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+        color: $danger;
+    }
+}
