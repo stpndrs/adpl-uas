@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TeacherTemplateExport;
+use App\Imports\TeachersImport;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 
 class TeacherController extends Controller
@@ -21,7 +24,7 @@ class TeacherController extends Controller
                 ->orWhere('nip', 'like', '%' . $request->search . '%');
         }
 
-        $teachers = $query->get();
+        $teachers = $query->paginate(10);
         return view('teacher.index', compact('teachers'));
     }
 
@@ -103,5 +106,32 @@ class TeacherController extends Controller
         } catch (Throwable $th) {
             return back()->with('error', 'Gagal menghapus data guru');
         }
+    }
+
+    public function importView()
+    {
+        return view('teacher.import');
+    }
+
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls|max:2048'
+        ]);
+
+        try {
+            // Logika import di sini (misal menggunakan Excel::import)
+            Excel::import(new TeachersImport, $request->file('file'));
+
+            return redirect()->route('teachers.index')->with('success', 'Data guru berhasil diimport');
+        } catch (\Throwable $th) {
+            // Sesuai alur 'Failed Controller' pada diagram Anda
+            return back()->with('error', 'Gagal mengimport data: ' . $th->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new TeacherTemplateExport, 'template_import_guru.xlsx');
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('gender');
             $table->string('nip');
-            $table->foreignId('user_ud')->references('id')->on('users');
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

@@ -10,17 +10,27 @@
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{{ route('students.create') }}">Tambah Data</a></li>
                 <li><a class="dropdown-item" href="{{ route('students.import.view') }}">Import Excel</a></li>
+                <li><a class="dropdown-item" href="{{ route('students.import.download') }}">Download Template Excel</a></li>
             </ul>
         </div>
     </div>
 
     <div class="card p-4">
-        <div class="d-flex justify-content-center mb-4">
+        <form action="{{ url()->current() }}" method="GET" class="d-flex justify-content-center mb-4">
             <div class="input-group w-50 border rounded-pill overflow-hidden">
-                <input type="text" class="form-control border-0 px-3" placeholder="Search">
-                <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
+                <input type="text" name="search" class="form-control border-0 px-3"
+                    placeholder="Cari berdasarkan Nama atau NISN..." value="{{ request('search') }}"> <button type="submit"
+                    class="btn btn-primary px-4">
+                    <i class="bi bi-search"></i>
+                </button>
+
+                @if (request('search'))
+                    <a href="{{ url()->current() }}" class="btn btn-outline-secondary px-3">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                @endif
             </div>
-        </div>
+        </form>
 
         <div class="table-responsive">
             <table class="table align-middle">
@@ -40,7 +50,7 @@
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->address }}</td>
                             <td>{{ $student->nisn }}</td>
-                            <td>{{ $student->gender }}</td>
+                            <td>{{ $student->gender == 1 ? 'Laki-laki' : 'Perempuan' }}</td>
                             <td>{{ $student->class }}</td>
                             <td class="text-center">
                                 <a href="{{ url()->current() . '/' . $student->id . '/edit' }}"
@@ -55,6 +65,8 @@
                     @endforeach
                 </tbody>
             </table>
+
+            {{ $students->links() }}
         </div>
     </div>
 @endsection

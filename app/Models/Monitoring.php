@@ -15,15 +15,27 @@ class Monitoring extends Model
         'end_date',
     ];
 
-    public function student() {
+    public function student()
+    {
         return $this->belongsTo(Student::class);
     }
 
-    public function company() {
+    public function company()
+    {
         return $this->belongsTo(Company::class);
     }
 
-    public function teacher() {
+    public function teacher()
+    {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Presences::class);
+    }
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
     }
 }

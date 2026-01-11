@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CompanyTemplateExport;
+use App\Imports\CompaniesImport;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 
 class CompanyController extends Controller
@@ -12,9 +15,17 @@ class CompanyController extends Controller
      * TAMPILKAN DATA (Sesuai diagram 'View Data Akun')
      * Mengambil semua data menggunakan Eloquent all()
      */
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::all();
+        $query = Company::with('user');
+
+        // Logika Pencarian berdasarkan Nama atau NIP
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('phone', 'like', '%' . $request->search . '%');
+        }
+
+        $companies = $query->paginate(10);
         return view('company.index', compact('companies'));
     }
 
@@ -121,5 +132,32 @@ class CompanyController extends Controller
         } catch (Throwable $th) {
             return back()->with('error', 'Gagal mengubah status');
         }
+    }
+
+    public function importView()
+    {
+        return view('company.import');
+    }
+
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls|max:2048'
+        ]);
+
+        try {
+            // Logika import di sini (misal menggunakan Excel::import)
+            Excel::import(new CompaniesImport, $request->file('file'));
+
+            return redirect()->route('companies.index')->with('success', 'Data siswa berhasil diimport');
+        } catch (\Throwable $th) {
+            // Sesuai alur 'Failed Controller' pada diagram Anda
+            return back()->with('error', 'Gagal mengimport data: ' . $th->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new CompanyTemplateExport, 'template_import_instansi.xlsx');
     }
 }

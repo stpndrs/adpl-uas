@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StudentTemplateExport;
+use App\Imports\StudentsImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 
 class StudentController extends Controller
@@ -22,7 +25,7 @@ class StudentController extends Controller
                 ->orWhere('nisn', 'like', '%' . $request->search . '%');
         }
 
-        $students = $query->get();
+        $students = $query->paginate(10);
         return view('student.index', compact('students'));
     }
 
@@ -41,7 +44,7 @@ class StudentController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|string|max:255',
+                'name'    => 'required|Student|$student:255',
                 'nisn'    => 'required|unique:students,nisn',
                 'address' => 'required',
                 'gender'  => 'required|in:L,P', // Contoh: Laki-laki / Perempuan
@@ -62,27 +65,25 @@ class StudentController extends Controller
     /**
      * FORM EDIT
      */
-    public function edit(string $id)
+    public function edit(Student $student)
     {
-        $student = Student::findOrFail($id);
         return view('student.edit', compact('student'));
     }
 
     /**
      * UPDATE DATA (Sesuai diagram 'Edit Data')
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Student $student)
     {
         try {
             $request->validate([
                 'name'    => 'required',
-                'nisn'    => 'required|unique:students,nisn,' . $id,
+                'nisn'    => 'required|unique:students,nisn,' . $student->id,
                 'address' => 'required',
                 'gender'  => 'required',
                 'class'   => 'required',
             ]);
 
-            $student = Student::findOrFail($id);
             $student->update($request->all());
 
             return redirect()->route('students.index')
@@ -95,10 +96,9 @@ class StudentController extends Controller
     /**
      * HAPUS DATA
      */
-    public function destroy(string $id)
+    public function destroy(Student $student)
     {
         try {
-            $student = Student::findOrFail($id);
             $student->delete();
 
             return redirect()->route('students.index')
@@ -121,12 +121,17 @@ class StudentController extends Controller
 
         try {
             // Logika import di sini (misal menggunakan Excel::import)
-            // Excel::import(new StudentsImport, $request->file('file'));
+            Excel::import(new StudentsImport, $request->file('file'));
 
             return redirect()->route('students.index')->with('success', 'Data siswa berhasil diimport');
         } catch (\Throwable $th) {
             // Sesuai alur 'Failed Controller' pada diagram Anda
             return back()->with('error', 'Gagal mengimport data: ' . $th->getMessage());
         }
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new StudentTemplateExport, 'template_import_siswa.xlsx');
     }
 }

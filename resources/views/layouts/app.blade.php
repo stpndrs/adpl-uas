@@ -1,3 +1,4 @@
+f
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +18,7 @@
             --bs-primary: #2563eb;
             --bs-orange: #f97316;
         }
-        
+
         body {
             background-color: #f8fafc;
             font-family: "Poppins", sans-serif;
@@ -75,29 +76,88 @@
 
 <body>
     <div class="sidebar d-flex flex-column p-3">
-        <h4 class="px-3 mb-4 fw-bold">Logo</h4>
+        <h4 class="px-3 mb-4 fw-bold text-orange" style="color: #f97316;">Monitoring PKL</h4>
         <small class="text-uppercase text-muted px-3 mb-2" style="font-size: 10px;">Main Menu</small>
+
         <ul class="nav nav-pills flex-column mb-auto">
-            <li><a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}"><i
-                        class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-            <li><a href="/students" class="nav-link {{ request()->is('students*') ? 'active' : '' }}"><i
-                        class="bi bi-people me-2"></i> Data Siswa</a></li>
-            <li><a href="/teachers" class="nav-link {{ request()->is('teachers*') ? 'active' : '' }}"><i
-                        class="bi bi-person-badge me-2"></i> Data Guru</a></li>
-            <li><a href="/companies" class="nav-link {{ request()->is('companies*') ? 'active' : '' }}"><i
-                        class="bi bi-building me-2"></i> Data Instansi</a></li>
-            <li><a href="/users" class="nav-link {{ request()->is('users*') ? 'active' : '' }}"><i
-                        class="bi bi-person-gear me-2"></i> Data Pengguna</a></li>
-            <li><a href="/monitorings" class="nav-link {{ request()->is('monitorings*') ? 'active' : '' }}"><i
-                        class="bi bi-display me-2"></i> Data Monitoring</a></li>
+            <li class="nav-item">
+                <a href="{{ route('dashboard') }}"
+                    class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-bar-chart me-2"></i> Dashboard
+                </a>
+            </li>
+
+            @if (Auth::user()->role == 1)
+                <li><a href="{{ route('students.index') }}"
+                        class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}">
+                        <i class="bi bi-book me-2"></i> Data Siswa</a></li>
+
+                <li><a href="{{ route('teachers.index') }}"
+                        class="nav-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard me-2"></i> Data Guru</a></li>
+
+                <li><a href="{{ route('companies.index') }}"
+                        class="nav-link {{ request()->routeIs('companies.*') ? 'active' : '' }}">
+                        <i class="bi bi-building me-2"></i> Data Instansi</a></li>
+
+                <li><a href="{{ route('users.index') }}"
+                        class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <i class="bi bi-people me-2"></i> Data Pengguna</a></li>
+
+                <li><a href="{{ route('submissions.index') }}"
+                        class="nav-link {{ request()->routeIs('submissions.*') ? 'active' : '' }}">
+                        <i class="bi bi-display me-2"></i> Data Pengajuan</a></li>
+
+                <li><a href="{{ route('monitorings.index') }}"
+                        class="nav-link {{ request()->routeIs('monitorings.*') ? 'active' : '' }}">
+                        <i class="bi bi-activity me-2"></i> Data Monitoring</a></li>
+            @elseif(Auth::user()->role == 2)
+                <li><a href="{{ route('teacher.monitoring.index') }}"
+                        class="nav-link {{ request()->routeIs('teacher.monitoring.*') ? 'active' : '' }}">
+                        <i class="bi bi-activity me-2"></i> Data Monitoring</a></li>
+            @elseif(Auth::user()->role == 3)
+                <li><a href="{{ route('company.monitoring.index') }}"
+                        class="nav-link {{ request()->routeIs('company.monitoring.*') ? 'active' : '' }}">
+                        <i class="bi bi-activity me-2"></i> Data Monitoring</a></li>
+            @elseif (Auth::user()->role == 4)
+                <li>
+                    <a href="{{ route('student.submissions.index') }}"
+                        class="nav-link {{ request()->routeIs('student.submissions.*') ? 'active' : '' }}">
+                        <i class="bi bi-bookmark me-2"></i> Pengajuan PKL
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('student.activities.index') }}"
+                        class="nav-link {{ request()->routeIs('student.activities.index') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard me-2"></i> Presensi & Kegiatan
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('student.reports.index') }}"
+                        class="nav-link {{ request()->routeIs('student.reports.index') ? 'active' : '' }}">
+                        <i class="bi bi-hard-drive me-2"></i> Laporan
+                    </a>
+                </li>
+            @endif
+
+            <hr>
+            <li class="nav-item">
+                <form action="{{ route('logout') }}" method="POST" class="w-100">
+                    @csrf
+                    <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="bi bi-box-arrow-left me-2"></i> Logout
+                    </button>
+                </form>
+            </li>
         </ul>
     </div>
 
     <div class="main-content">
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
             <div class="ms-auto d-flex align-items-center">
-                <span class="me-2 fw-bold">Admin</span>
-                <img src="https://ui-avatars.com/api/?name=Admin" class="rounded-circle" width="35">
+                <span class="me-2 fw-bold">{{ Auth::user()->name }}</span>
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}" class="rounded-circle"
+                    width="35">
             </div>
         </nav>
 
@@ -105,6 +165,12 @@
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif

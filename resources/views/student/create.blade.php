@@ -46,8 +46,8 @@
                     <select name="gender" class="form-select form-control-custom @error('gender') is-invalid @enderror"
                         required>
                         <option value="" disabled selected>Pilih Jenis Kelamin</option>
-                        <option value="Laki-laki" {{ old('gender') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                        <option value="Perempuan" {{ old('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                        <option value="1" {{ old('gender') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="2" {{ old('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                     </select>
                     @error('gender')
                         <div class="invalid-feedback">{{ $message }}</div>
